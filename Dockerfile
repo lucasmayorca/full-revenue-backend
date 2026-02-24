@@ -21,6 +21,9 @@ RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
+# Create uploads dir with correct ownership before switching to non-root user
+RUN mkdir -p /app/uploads/kyc && chown -R node:node /app/uploads
+
 EXPOSE 3001
 
 USER node

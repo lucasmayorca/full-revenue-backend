@@ -529,9 +529,9 @@ function buildReason(params: {
  * Calcula la oferta de crédito usando multiplicadores fijos sobre el ingreso base.
  *
  * La base (syntageMonthly) varía por merchant. Los multiplicadores son fijos:
- *  - Solo buró:               base × 1.5
- *  - Buró + social:           base × 2.0
- *  - Buró + social + fiscal:  base × 4.0
+ *  - Solo buró:               base × 1.2  → $60k
+ *  - Buró + social:           base × 1.4  → $70k
+ *  - Buró + social + fiscal:  base × 2.0  → $100k
  *
  * La tasa y condiciones varían según el bureau score.
  * Repago: 20% retención de ventas Rappi + débito directo del remanente.
@@ -544,7 +544,7 @@ function computeCreditOffer(
   hasFiscal: boolean = false
 ): CreditOffer {
   // Fixed multipliers, variable base
-  const multiplier = hasFiscal ? 4.0 : hasSocial ? 2.0 : 1.5;
+  const multiplier = hasFiscal ? 2.0 : hasSocial ? 1.4 : 1.2;
   const approvedAmount = Math.round((baseRevenue * multiplier) / 1000) * 1000;
 
   // Tasa mensual basada en bureau score
@@ -579,9 +579,9 @@ function computeCreditOffer(
  * Pre-calificación ligera: obtiene la oferta pre-aprobada de Rappi (ventas plataforma)
  * y aplica los multiplicadores fijos:
  *  - Base:   pre_approved_amount (oferta pre-aprobada de Rappi)
- *  - Buró:   base × 1.5
- *  - Social: base × 2.0
- *  - Fiscal: base × 4.0
+ *  - Buró:   base × 1.2  → $60k
+ *  - Social: base × 1.4  → $70k
+ *  - Fiscal: base × 2.0  → $100k
  */
 export async function runPrequalification(
   merchantId: string
@@ -602,9 +602,9 @@ export async function runPrequalification(
   }
 
   // Fixed multipliers applied to pre-approved base
-  const bureauOffer = Math.round((baseAmount * 1.5) / 1000) * 1000;
-  const socialOffer = Math.round((baseAmount * 2.0) / 1000) * 1000;
-  const fiscalOffer = Math.round((baseAmount * 4.0) / 1000) * 1000;
+  const bureauOffer = Math.round((baseAmount * 1.2) / 1000) * 1000;
+  const socialOffer = Math.round((baseAmount * 1.4) / 1000) * 1000;
+  const fiscalOffer = Math.round((baseAmount * 2.0) / 1000) * 1000;
 
   logger.info("prequal_completed", {
     merchant_id: merchantId,
